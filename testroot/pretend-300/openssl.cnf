@@ -1,0 +1,151 @@
+# OpenSSL intermediate CA configuration file.
+
+[ ca ]
+# `man ca`
+default_ca = CA_default
+
+[ CA_default ]
+# Directory and file locations.
+dir               = /depot/certvault/testroot/pretend-300
+certs             = $dir/certs
+crl_dir           = $dir/crl
+new_certs_dir     = $dir/newcerts
+database          = $dir/index.txt
+serial            = $dir/serial
+RANDFILE          = $dir/private/.rand
+copy_extensions   = copy
+
+private_key       = $dir/private/pretend-300.key.pem
+certificate       = $dir/certs/pretend-300.cert.pem
+
+# For certificate revocation lists.
+crlnumber         = $dir/crlnumber
+crl               = $dir/crl/pretend-300.crl.pem
+crl_extensions    = crl_ext
+default_crl_days  = 30
+default_md        = sha256
+name_opt          = ca_default
+cert_opt          = ca_default
+default_days      = 375
+preserve          = no
+policy            = policy_loose
+
+[ policy_strict ]
+# The root CA should only sign intermediate certificates that match.
+# See the POLICY FORMAT section of `man ca`.
+countryName             = match
+stateOrProvinceName     = match
+organizationName        = match
+0.organizationalUnitName  = optional
+1.organizationalUnitName  = optional
+2.organizationalUnitName  = optional
+commonName              = supplied
+#emailAddress            = optional
+
+[ policy_loose ]
+# Allow the intermediate CA to sign a more diverse range of certificates.
+# See the POLICY FORMAT section of the `ca` man page.
+countryName             = optional
+stateOrProvinceName     = optional
+#localityName            = optional
+organizationName        = optional
+0.organizationalUnitName  = optional
+1.organizationalUnitName  = optional
+2.organizationalUnitName  = optional
+commonName              = supplied
+#emailAddress            = optional
+
+[ req ]
+
+# Options for the `req` tool (`man req`).
+default_bits        = 2048
+distinguished_name  = req_distinguished_name
+string_mask         = utf8only
+default_md          = sha256
+
+# Extension to add when the -x509 option is used.
+x509_extensions     = v3_ca
+
+[ req_distinguished_name ]
+# See <https://en.wikipedia.org/wiki/Certificate_signing_request>.
+countryName                     = Country Name (2 letter code)
+stateOrProvinceName             = State or Province Name
+#localityName                    = Locality Name
+organizationName              = Organization Name
+0.organizationalUnitName        = Organizational Unit Name - Employee Type
+1.organizationalUnitName        = Organizational Unit Name - Generating Org
+2.organizationalUnitName        = Organizational Unit Name - DoD
+commonName                      = Common Name
+#emailAddress                    = Email Address
+
+# Optionally, specify some defaults.
+countryName_default             = US
+
+stateOrProvinceName_default     = PA
+#localityName_default            = Elverson
+organizationName_default      = TRC
+0.organizationalUnitName_default  = Three Ring Circus
+1.organizationalUnitName_default  = Four Ring Circus
+2.organizationalUnitName_default  = Five Ring Circus
+commonName_default              = ImageServer
+#emailAddress_default            = mikevac@protonmail.com
+
+[ v3_ca ]
+
+# Extensions for a typical CA (`man x509v3_config`).
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints = critical, CA:true
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+
+[ v3_intermediate_ca ]
+# Extensions for a typical intermediate CA (`man x509v3_config`).
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints = critical, CA:true, pathlen:0
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+
+[ usr_cert ]
+# Extensions for client certificates (`man x509v3_config`).
+basicConstraints = CA:FALSE
+nsCertType = client, email
+nsComment = "OpenSSL Generated Client Certificate"
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage = clientAuth, emailProtection
+
+[ server_cert ]
+# Extensions for server certificates (`man x509v3_config`).
+basicConstraints = CA:FALSE
+nsCertType = server
+nsComment = "OpenSSL Generated Server Certificate"
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer:always
+keyUsage = critical, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+crlDistributionPoints = URI:http://notreal.com/intermediate.crl.pem
+
+[ dual_cert ]
+# Extensions for server+client certificates (`man x509v3_config`).
+basicConstraints = CA:FALSE
+nsCertType = client, server, email
+nsComment = "OpenSSL Generated Server+Client Certificate"
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid, issuer:always
+keyUsage = critical, nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage = clientAuth, serverAuth, emailProtection
+
+[ crl_ext ]
+# Extension for CRLs (`man x509v3_config`).
+authorityKeyIdentifier=keyid:always
+
+[ ocsp ]
+# Extension for OCSP signing certificates (`man ocsp`).
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+keyUsage = critical, digitalSignature
+extendedKeyUsage = critical, OCSPSigning
+
+
