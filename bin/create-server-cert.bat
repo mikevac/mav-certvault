@@ -48,7 +48,7 @@ ECHO ===========================================================================
 ECHO create the server certificate sign request
 ECHO ===========================================================================
 CALL openssl req -config %INTERMEDIATE_DIR%/openssl.cnf ^
-    -addext "subjectAltName = DNS:localhost.com, DNS:www.localhost.com, DNS:localhost" ^
+    -addext "subjectAltName = DNS:localhost" ^
     -passin pass:redrover -passout pass:redrover ^
     -key %INTERMEDIATE_DIR%/private/%SERVER_NAME%.key.pem -new -sha256 ^
     -out %INTERMEDIATE_DIR%/csr/%SERVER_NAME%.csr.pem
